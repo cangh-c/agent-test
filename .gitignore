@@ -1,0 +1,39 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+
+# Unit test / coverage reports
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Terraform state & provider caches
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+
+# Environment variables & local secrets (never commit secrets)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+credentials.json
+
+# Local SQLite session DBs
+*.db
+*.sqlite3
+
+*.metadata.json

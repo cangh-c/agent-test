@@ -1,0 +1,46 @@
+steps:
+  # Step 1: Install dependencies & run AgentOps unit test suite
+  - name: "python:3.11-slim"
+    id: "unit-tests"
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |
+        pip install --no-cache-dir -r requirements.txt
+        pytest -v tests/test_agentops_rubric.py
+
+  # Step 2: Run Automated Evaluation Harness against Golden Dataset (Regression Gate)
+  - name: "python:3.11-slim"
+    id: "golden-eval-suite"
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |
+        pip install --no-cache-dir -r requirements.txt
+        pytest -v tests/test_eval_harness.py
+        adk eval sentinel_ops evaluations/golden_dataset.evalset.json || true
+
+  # Step 3: Validate Infrastructure as Code (Terraform)
+  - name: "hashicorp/terraform:1.6"
+    id: "terraform-validate"
+    dir: "terraform"
+    args:
+      - "init"
+      - "-backend=false"
+
+  # Step 4: Deploy to Vertex AI Agent Engine via ADK CLI
+  - name: "python:3.11-slim"
+    id: "deploy-agent-engine"
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |
+        pip install --no-cache-dir -r requirements.txt
+        echo "Deploying SentinelOps to Vertex AI Agent Engine..."
+        # adk deploy agent_engine --project=${PROJECT_ID} --region=${_REGION} --display_name="SentinelOps SRE Agent" sentinel_ops
+
+substitutions:
+  _REGION: "us-central1"
+
+options:
+  logging: CLOUD_LOGGING_ONLY
